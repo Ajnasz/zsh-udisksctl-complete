@@ -1,0 +1,166 @@
+#compdef udisksctl
+#autoload
+
+# ------------------------------------------------------------------------------
+# The MIT License
+#
+# Copyright 2020 Lajos Koszti
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+
+local -a _1st_arguments
+_1st_arguments=(
+	'help:Shows help information'
+	'info:Shows information about an object'
+	'dump:Shows information about all objects'
+	'status:Shows high-level status'
+	'monitor:Monitor changes to objects'
+	'mount:Mount a filesystem'
+	'unmount:Unmount a filesystem'
+	'unlock:Unlock an encrypted device'
+	'lock:Lock an encrypted device'
+	'loop-setup:Set-up a loop device'
+	'loop-delete:Delete a loop device'
+	'power-off:Safely power off a drive'
+	'smart-simulate:Set SMART data for a drive'
+)
+
+_udisks_mount_args() {
+	_arguments \
+		'(-p --object-path)'{-p,--object-path}'[Object to mount]:object paths:_files' \
+		'(-b --block-device)'{-b,--block-device}'[Block device to mount]:block devices:_files -g "*(%b)"' \
+		'(-t --filesystem-type)'{-t,--filesystem-type}'[Filesystem type to use]' \
+		'(-o --options)'{-o,--options}'[Mount options]' \
+		'(--no-user-interaction)--no-user-interaction[Do not authenticate the user if needed]' \
+		&& return 0
+}
+
+_udisks_unmount_args() {
+	_arguments \
+		'(-p --object-path)'{-p,--object-path}'[Object to unmount]:object paths:_files' \
+		'(-b --block-device)'{-b,--block-device}'[Block device to unmount]:block devices:_files -g "*(%b)"' \
+		'(-f --force)'{-f,--force}'[Force/lazy unmount]' \
+		'(--no-user-interaction)--no-user-interaction[Do not authenticate the user if needed]' \
+		&& return 0
+}
+
+_udisks_info_args() {
+	_arguments \
+		'(-p --object-path)'{-p,--object-path}'[Object to get information about]:objects:_files' \
+		'(-b --block-device)'{-b,--block-device}'[Block device to get information about]:block devices:_files -g "*(%b)"' \
+		'(-d --drive)'{-d,--drive}'[Drive to get information about]:drives:_files' \
+		&& return 0
+}
+
+_udisks_unlock_args() {
+	_arguments \
+		'(-p --object-path)'{-p,--object-path}'[Object to unlock]:_files' \
+		'(-b --block-device)'{-b,--block-device}'[Block device to unlock]:block devices:files -g "*(%b)"' \
+		'(--no-user-interaction)--no-user-interaction[Do not authenticate the user if needed]' \
+		'(--key-file)--keyfile[Keyfile for unlocking]:files:_files' \
+		&& return 0
+}
+
+_udisks_lock_args() {
+	_arguments \
+		'(-p --object-path)'{-p,--object-path}'[Object to lock]:_files' \
+		'(-b --block-device)'{-b,--block-device}'[Block device to lock]:block devices:files -g "*(%b)"' \
+		'(--no-user-interaction)--no-user-interaction[Do not authenticate the user if needed]' \
+		&& return 0
+}
+
+
+_udisks_loop_setup_args() {
+	_arguments \
+		'(-f --file)'{-f,--file}'[File to set-up a loop device for]:files:_files' \
+		'(-r --read-only)'{-r,--read-only}'[Setup read-only device]' \
+		'(-o --offset)'{-o,--offset}'[Start at <num> bytes into file]' \
+		'(-s --size)'{-s,--size}'[Limit size to <num> bytes]' \
+		'(--no-user-interaction)--no-user-interaction[Do not authenticate the user if needed]' \
+		&& return 0
+}
+
+_udisks_loop_delete_args() {
+	_arguments \
+		'(-p --object-path)'{-p,--object-path}'[Object for loop device to delete]:files:_files' \
+		'(-b --block-device)'{-b,--block-device}'[Loop device to delete]:loop devices:_files -g "*(%b)"' \
+		'(--no-user-interaction)--no-user-interaction[Do not authenticate the user if needed]' \
+		&& return 0
+}
+
+_udisks_power_off_args() {
+	_arguments \
+		'(-p --object-path)'{-p,--object-path}'[Object path for ATA device]:files:_files' \
+		'(-b --block-device)'{-b,--block-device}'[Device file for ATA device]:block devices:_files -g "*(%b)"' \
+		'(--no-user-interaction)--no-user-interaction[Do not authenticate the user if needed]' \
+		&& return 0
+}
+
+_udisks_smart_simulate_args() {
+	_arguments \
+		'(-f --file)'{-f,--file}'[File with libatasmart blob:files:_files]' \
+		'(-p --object-path)'{-p,--object-path}'[Object path for ATA device]:files:_files' \
+		'(-b --block-device)'{-b,--block-device}'[Device file for ATA device]:block devices:_files -g "*(%b)"' \
+		'(--no-user-interaction)--no-user-interaction[Do not authenticate the user if needed]' \
+		&& return 0
+}
+
+_command_args() {
+	case "$words[1]" in
+		help|status|dump|monitor)
+			;;
+		mount)
+			_udisks_mount_args
+			;;
+		unmount)
+			_udisks_unmount_args
+			;;
+		info)
+			_udisks_info_args
+			;;
+		lock)
+			_udisks_lock_args
+			;;
+		unlock)
+			_udisks_unlock_args
+			;;
+		loop-setup)
+			_udisks_loop_setup_args
+			;;
+		loop-delete)
+			_udisks_loop_delete_args
+			;;
+		power-off)
+			_udisks_power_off_args
+			;;
+		smart-simulate)
+			_udisks_smart_simulate_args
+			;;
+	esac
+}
+
+_arguments -C '*:: :->subcmds'
+if (( CURRENT == 1 ))
+then
+	_describe -t commands "udisksctl subcommand" _1st_arguments
+	return
+fi
+
+_command_args
